@@ -1,0 +1,33 @@
+@import "../runo/styles.css";
+.v-app {
+background: gray;
+font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+font-weight: bold;
+color: #222;
+}
+
+.toolbar .v-button {
+display: block;
+width: 65px;
+height: 55px;
+background: transparent;
+border: none;
+text-align: center;
+}
+
+.toolbar .v-button img {
+display: block;
+margin-left: 2px;
+margin-right: 50px;
+margin-bottom: 5px;
+}
+
+.layout	{
+font-family: "Lucida Grande", Helvetica, Arial, sans-serif;
+font-weight: bold;
+color: #222;
+}
+
+.verlaufList{
+background: #999999;
+}
