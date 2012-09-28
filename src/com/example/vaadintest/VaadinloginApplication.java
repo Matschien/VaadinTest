@@ -1,17 +1,23 @@
 package com.example.vaadintest;
 
+import java.io.IOException;
+
+import javax.naming.ConfigurationException;
+
 import com.example.vaadintest.gui.ILoginForm;
-import com.example.vaadintest.gui.LoginFormComp;
+import com.example.vaadintest.gui.ILoginFormListener;
 import com.example.vaadintest.gui.LoginFormFactory;
 import com.example.vaadintest.gui.LoginFormImpl;
 import com.example.vaadintest.gui.generated.VerlaufList;
 import com.example.vaadintest.gui.generated.LoginForm;
+import com.example.vaadintest.util.AppConfig;
 import com.vaadin.Application;
 import com.vaadin.terminal.*;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 
-public class VaadinloginApplication extends Application implements Button.ClickListener{
+public class VaadinloginApplication extends Application implements ILoginFormListener ,Button.ClickListener {	
+
 	private Label label = new Label();
 	private Label label1 = new Label();
 	private Label label2 = new Label();
@@ -19,21 +25,18 @@ public class VaadinloginApplication extends Application implements Button.ClickL
 	Embedded em = new Embedded("", new ThemeResource("images/logo.png"));
 	private VerlaufList verlaufList = new VerlaufList();
 	Window mainWindow = new Window("Vaadinlogin Application");
-	private ILoginForm loginForm = LoginFormFactory.createLoginForm(); // TODO
-	private int anzVersuche = 0;
+	private ILoginForm loginForm;
 	
 	@Override
-	public void init() {
-		setTheme("test");
-		setLogoutURL("http://www.schlothauer.de/");
-		buildMainWindow();
-		getMainWindow().addWindow(loginForm.getWindow());
-		loginForm.getAnmelden().addListener((Button.ClickListener) this);
-		loginForm.getAbbrechen().addListener((Button.ClickListener) this);
-		logout.addListener((Button.ClickListener) this);
+	public void init(){
+			setTheme("test");
+			setLogoutURL("http://www.schlothauer.de/");
+			buildMainWindow("");
+			getMainWindow().addWindow(loginForm.getWindow());
+			logout.addListener((Button.ClickListener) this);
 	}
 	
-	private void buildMainWindow() {
+	private void buildMainWindow(String benID) {
 		//"Toolbar" mit Logout-Button & Logo
 		HorizontalLayout toolbar = new HorizontalLayout();
 		toolbar.setWidth("100%");
@@ -51,63 +54,34 @@ public class VaadinloginApplication extends Application implements Button.ClickL
 		layout.setWidth("100%");
 		layout.setHeight("100%");
 		layout.setStyleName("layout");
-		label.setCaption("Dein Benutzername: "+ loginForm.getTxtBen().toString());
-		label.setContentMode(3);
+		label.setCaption("Dein Benutzername: "+ benID);
 		layout.addComponent(label);
 		layout.setComponentAlignment(label, Alignment.MIDDLE_CENTER);
-		label1.setCaption("Dein Passwort: "+ loginForm.getPsw().toString());
-		label1.setContentMode(3);
+		label1.setCaption("Dein Passwort: Haha das dachtest du wohl!");
 		layout.addComponent(label1);
 		layout.setComponentAlignment(label1, Alignment.MIDDLE_CENTER);
-		getLabel2().setCaption("Du hast genau "+ anzVersuche +" Versuch/e gebraucht, um dich anzumelden!");
-		getLabel2().setContentMode(3);
-		layout.addComponent(getLabel2());
-		layout.setComponentAlignment(getLabel2(), Alignment.MIDDLE_CENTER);
-		layout.addComponent(verlaufList);
+		try {
+			AppConfig.createInst(getProperty("cfgFile"));
+			loginForm = LoginFormFactory.createLoginForm(this);
+			//
+			getLabel2().setCaption("xxxx");
+			layout.addComponent(getLabel2());
+			layout.setComponentAlignment(getLabel2(), Alignment.MIDDLE_CENTER);
+			layout.addComponent(verlaufList);
+		}
+		catch(ConfigurationException e) {
+			//TODO 
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		mainWindow.addComponent(layout);
 		
 		setMainWindow(mainWindow);
 	}
 
 	
-	@Override
-	public void buttonClick(ClickEvent event) {
-		loginForm.removeErrors();
-		final Button source = event.getButton();
-		
-		if(anzVersuche > 9){
-			setLogoutURL("http://www.google.de/");
-			close();
-		}
-		else if (source == loginForm.getAnmelden()) {
-			if (loginForm.getTxtBen().toString().equals("Malte") & loginForm.getPsw().toString().equals("2malte")){
-				anzVersuche += 1;
-				loginForm.loginBeenden();
-				buildMainWindow();
-			}
-			else{
-				anzVersuche += 1;
-				if(!loginForm.getTxtBen().toString().equals("Malte") && !loginForm.getPsw().toString().equals("2malte")){
-					loginForm.setBenError();
-					loginForm.setPswError();
-				}
-				else if(!loginForm.getTxtBen().toString().equals("Malte") && loginForm.getPsw().toString().equals("2malte")){
-					loginForm.setBenError();
-				}
-				else {
-					loginForm.setPswError();
-				}
-				loginForm.resetInput();
-				loginForm.getTxtBen().focus();
-			}
-		}
-		else if (source== loginForm.getAbbrechen()){
-			close();
-		}
-		else if (source == logout){
-			close();
-		}
-	}
 
 	public Label getLabel2() {
 		return label2;
@@ -115,5 +89,25 @@ public class VaadinloginApplication extends Application implements Button.ClickL
 
 	public void setLabel2(Label label2) {
 		this.label2 = label2;
+	}
+	
+	public void loginOkay(String benID) {
+		buildMainWindow(benID);
+	}
+
+	public void loginCanceled() {
+		close();
+	}
+
+	public void loginDenied() {
+		close();
+	}
+
+	public void buttonClick(ClickEvent event) {
+		final Button source = event.getButton();
+		if (source == logout) {
+			close();
+		}
+		
 	}
 }

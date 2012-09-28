@@ -1,6 +1,5 @@
 package com.example.vaadintest.gui;
 
-import com.vaadin.terminal.UserError;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.TextField;

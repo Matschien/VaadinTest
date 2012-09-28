@@ -16,6 +16,11 @@
 			<param-name>application</param-name>
 			<param-value>com.example.vaadintest.VaadinloginApplication</param-value>
 		</init-param>
+		<init-param>
+			<description>Meine Konfigurationsdatei</description>
+			<param-name>cfgFile</param-name>
+			<param-value>/home/malte/workspaceVaadin/VaadinTest/conf/VadinTest.properties</param-value>
+		</init-param>
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>Vaadinlogin Application</servlet-name>
